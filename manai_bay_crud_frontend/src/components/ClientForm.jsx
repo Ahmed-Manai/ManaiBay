@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createClient, updateClient } from '../api/clientApi';
+import {
+  Box, TextField, Button, Typography, Stack
+} from '@mui/material';
 
 const ClientForm = ({ onCreated, editClient, clearEdit }) => {
   const [name, setName] = useState('');
@@ -26,13 +29,37 @@ const ClientForm = ({ onCreated, editClient, clearEdit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>{editClient ? 'Edit Client' : 'Add Client'}</h2>
-      <input value={name} onChange={e => setName(e.target.value)} placeholder="Name" required />
-      <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" required />
-      <button type="submit">{editClient ? 'Update' : 'Create'}</button>
-      {editClient && <button type="button" onClick={clearEdit}>Cancel</button>}
-    </form>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4 }}>
+      <Typography variant="h6" gutterBottom>
+        {editClient ? 'Edit Client' : 'Add New Client'}
+      </Typography>
+
+      <Stack spacing={2}>
+        <TextField
+          label="Name"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          required
+        />
+        <TextField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <Stack direction="row" spacing={2}>
+          <Button type="submit" variant="contained" color="primary">
+            {editClient ? 'Update' : 'Create'}
+          </Button>
+          {editClient && (
+            <Button variant="outlined" color="secondary" onClick={clearEdit}>
+              Cancel
+            </Button>
+          )}
+        </Stack>
+      </Stack>
+    </Box>
   );
 };
 

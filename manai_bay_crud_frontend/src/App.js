@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import ClientForm from './components/ClientForm';
 import ClientList from './components/ClientList';
+import { Container, Typography } from '@mui/material';
 
 function App() {
   const [refresh, setRefresh] = useState(false);
   const [editClient, setEditClient] = useState(null);
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-      <h1>User CRUD (React + FastAPI)</h1>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Client Manager
+      </Typography>
 
       <ClientForm
         onCreated={() => setRefresh(!refresh)}
@@ -20,7 +23,7 @@ function App() {
         refreshTrigger={refresh}
         onEdit={(client) => setEditClient(client)}
       />
-    </div>
+    </Container>
   );
 }
 
