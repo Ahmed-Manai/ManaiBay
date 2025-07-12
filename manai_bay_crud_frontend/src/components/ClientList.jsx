@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getClients, deleteClient } from '../api/clientApi';
 
-const ClientList = ({ onEdit }) => {
+const ClientList = ({ onEdit, refreshTrigger }) => {
   const [clients, setClients] = useState([]);
 
   const fetchClients = async () => {
@@ -11,7 +11,7 @@ const ClientList = ({ onEdit }) => {
 
   useEffect(() => {
     fetchClients();
-  }, []);
+  }, [refreshTrigger]);
 
   const handleDelete = async (id) => {
     await deleteClient(id);

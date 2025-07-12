@@ -3,6 +3,9 @@ from schemas import ClientCreate, Client
 from crud import create_client, get_client, get_clients, delete_client
 from uuid import UUID
 from fastapi.middleware.cors import CORSMiddleware
+from schemas import ClientCreate
+from database import session
+
 
 app = FastAPI()
 
@@ -32,3 +35,17 @@ def read(client_id: UUID):
 @app.delete("/clients/{client_id}")
 def delete(client_id: UUID):
     return delete_client(client_id)
+
+@app.put("/clients/{client_id}", response_model=Client)
+def update(client_id: UUID, data: ClientCreate):
+    client = get_client(client_id)
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+
+    session.execute(
+        """
+        UPDATE clients SET name=%s, email=%s WHERE id=%s
+        """,
+        (data.name, data.email, client_id)
+    )
+    return {"id": client_id, **data.dict()}
