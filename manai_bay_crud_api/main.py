@@ -2,8 +2,17 @@ from fastapi import FastAPI, HTTPException
 from schemas import ClientCreate, Client
 from crud import create_client, get_client, get_clients, delete_client
 from uuid import UUID
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Use "*" just for testing; restrict later
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/clients/", response_model=Client)
 def create(client: ClientCreate):
