@@ -1,13 +1,18 @@
+
+// Login form component for user authentication
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import api from '../api/clientApi';
 import { Box, TextField, Button, Typography, Alert, Stack, Paper } from '@mui/material';
 
 const LoginForm = ({ onLogin }) => {
+  // State for form fields and error handling
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Handle form submission for login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -61,6 +66,11 @@ const LoginForm = ({ onLogin }) => {
       </Box>
     </Paper>
   );
+
+// Prop types for type safety
+LoginForm.propTypes = {
+  onLogin: PropTypes.func.isRequired,
+};
 };
 
 export default LoginForm;

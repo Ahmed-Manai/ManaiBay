@@ -1,4 +1,7 @@
+
+// Component to display a list of clients in a table
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import api from '../api/clientApi';
 import {
   Table, TableBody, TableCell, TableContainer,
@@ -8,17 +11,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 const ClientList = ({ onEdit, refreshTrigger }) => {
+  // State for client list
   const [clients, setClients] = useState([]);
 
+  // Fetch clients from API
   const fetchClients = async () => {
     const res = await api.getClients();
     setClients(res.data);
   };
 
+  // Fetch clients when component mounts or refreshTrigger changes
   useEffect(() => {
     fetchClients();
   }, [refreshTrigger]);
 
+  // Handle client deletion
   const handleDelete = async (id) => {
     await api.deleteClient(id);
     fetchClients();
@@ -56,6 +63,12 @@ const ClientList = ({ onEdit, refreshTrigger }) => {
       </Table>
     </TableContainer>
   );
+
+// Prop types for type safety
+ClientList.propTypes = {
+  onEdit: PropTypes.func.isRequired,
+  refreshTrigger: PropTypes.any,
+};
 };
 
 export default ClientList;

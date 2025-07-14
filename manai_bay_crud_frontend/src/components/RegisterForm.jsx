@@ -1,14 +1,19 @@
+
+// Registration form component for new users
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import api from '../api/clientApi';
 import { Box, TextField, Button, Typography, Alert, Stack, Paper } from '@mui/material';
 
 const RegisterForm = ({ onRegister }) => {
+  // State for form fields, error, and success messages
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Handle form submission for registration
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -66,6 +71,11 @@ const RegisterForm = ({ onRegister }) => {
       </Box>
     </Paper>
   );
+
+// Prop types for type safety
+RegisterForm.propTypes = {
+  onRegister: PropTypes.func,
+};
 };
 
 export default RegisterForm;

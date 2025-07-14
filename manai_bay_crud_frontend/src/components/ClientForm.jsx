@@ -1,13 +1,18 @@
+
+// Form component for creating or editing a client
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import api from '../api/clientApi';
 import {
   Box, TextField, Button, Typography, Stack
 } from '@mui/material';
 
 const ClientForm = ({ onCreated, editClient, clearEdit }) => {
+  // State for form fields
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
+  // Populate form fields if editing an existing client
   useEffect(() => {
     if (editClient) {
       setName(editClient.name);
@@ -15,6 +20,7 @@ const ClientForm = ({ onCreated, editClient, clearEdit }) => {
     }
   }, [editClient]);
 
+  // Handle form submission for create or update
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (editClient) {
@@ -61,6 +67,13 @@ const ClientForm = ({ onCreated, editClient, clearEdit }) => {
       </Stack>
     </Box>
   );
+
+// Prop types for type safety
+ClientForm.propTypes = {
+  onCreated: PropTypes.func.isRequired,
+  editClient: PropTypes.object,
+  clearEdit: PropTypes.func.isRequired,
+};
 };
 
 export default ClientForm;
