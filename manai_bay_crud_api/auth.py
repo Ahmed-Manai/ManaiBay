@@ -6,8 +6,9 @@ from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from schemas import UserCreate
+from database import get_cassandra_session
 from uuid import uuid4
-from database import session
+
 
 
 # === CONFIGURATION ===
@@ -49,7 +50,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """
-    Create a JWT access token.
+    Create a JWT access token, including user role.
     Args:
         data (dict): Data to encode in token.
         expires_delta (timedelta, optional): Expiration time.
@@ -62,31 +63,28 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # === USER DATABASE ACCESS ===
-def get_user_by_email(email: str) -> dict | None:
     """
     Fetch a user from the database by email.
     Args:
         email (str): User's email address.
+        session: Cassandra session (must be provided).
     Returns:
         dict or None: User data if found, else None.
     """
-    result = session.execute(
-        "SELECT * FROM users WHERE email=%s ALLOW FILTERING", (email,)
-    ).one()
-    return result._asdict() if result else None
+    raise NotImplementedError("Use get_user_by_email_with_session(email, session) instead.")
 
 # === AUTHENTICATION LOGIC ===
-def authenticate_user(email: str, password: str, session=None) -> dict | None:
+def authenticate_user(email: str, password: str, session) -> dict | None:
     """
     Authenticate user by email and password.
     Args:
         email (str): User's email address.
         password (str): User's password.
-        session: Cassandra session (optional for DI).
+        session: Cassandra session (required).
     Returns:
         dict or None: User data if authenticated, else None.
     """
-    user = get_user_by_email(email) if session is None else get_user_by_email_with_session(email, session)
+    user = get_user_by_email_with_session(email, session)
     if not user or not verify_password(password, user["hashed_password"]):
         return None
     return user
@@ -106,11 +104,12 @@ def get_user_by_email_with_session(email: str, session) -> dict | None:
     return result._asdict() if result else None
 
 # === FASTAPI DEPENDENCY ===
-def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+def get_current_user(token: str = Depends(oauth2_scheme), session=Depends(get_cassandra_session)) -> dict:
     """
-    FastAPI dependency to get the current authenticated user from JWT token.
+    FastAPI dependency to get the current authenticated user from JWT token, including role.
     Args:
         token (str): JWT token from request.
+        session: Cassandra session (should be injected by FastAPI).
     Returns:
         dict: Authenticated user data.
     Raises:
@@ -124,11 +123,20 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
+        role: str = payload.get("role")
         if email is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = get_user_by_email(email)
+    user = get_user_by_email_with_session(email, session)
     if user is None:
         raise credentials_exception
+    # Return user info including role
+    user["role"] = user.get("role", role)
+    return user
+# === ADMIN DEPENDENCY ===
+
+def admin_required(user=Depends(get_current_user)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
     return user

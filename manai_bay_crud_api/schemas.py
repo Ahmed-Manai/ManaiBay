@@ -27,8 +27,13 @@ class UserCreate(BaseModel):
     """
     Model for user registration.
     """
+    first_name: str
+    last_name: str
     email: EmailStr  # User's email address
     password: str    # User's password
+    phone: str
+    location: str
+    role: str = "user"  # User's role ('admin' or 'user')
 
 class UserLogin(BaseModel):
     """
@@ -42,4 +47,11 @@ class UserOut(BaseModel):
     Model for returning user data.
     """
     id: UUID        # Unique identifier for the user
+    first_name: str
+    last_name: str
     email: EmailStr # User's email address
+    phone: str
+    location: str
+    role: str
+    created_date: str
+    updated_date: str

@@ -7,20 +7,51 @@ import { Box, TextField, Button, Typography, Alert, Stack, Paper } from '@mui/ma
 
 const RegisterForm = ({ onRegister }) => {
   // State for form fields, error, and success messages
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [location, setLocation] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Simple validation for required fields
+  const validate = () => {
+    if (!firstName || !lastName || !email || !password || !phone || !location) {
+      setError('All fields are required.');
+      return false;
+    }
+    // Email format validation
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      setError('Please enter a valid email address.');
+      return false;
+    }
+    // Phone format validation (simple)
+    if (!/^\+?\d{7,15}$/.test(phone)) {
+      setError('Please enter a valid phone number.');
+      return false;
+    }
+    return true;
+  };
 
   // Handle form submission for registration
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    if (!validate()) return;
     setLoading(true);
     try {
-      await api.post('/register', { email, password });
+      await api.post('/register', {
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password,
+        phone,
+        location
+      });
       setSuccess('Registration successful! You can now log in.');
       onRegister && onRegister();
     } catch (err) {
@@ -38,19 +69,47 @@ const RegisterForm = ({ onRegister }) => {
         </Typography>
         <Stack spacing={3}>
           <TextField
+            label="First Name"
+            value={firstName}
+            onChange={e => setFirstName(e.target.value)}
+            required
+            fullWidth
+            autoFocus
+          />
+          <TextField
+            label="Last Name"
+            value={lastName}
+            onChange={e => setLastName(e.target.value)}
+            required
+            fullWidth
+          />
+          <TextField
             label="Email"
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
             fullWidth
-            autoFocus
           />
           <TextField
             label="Password"
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
+            required
+            fullWidth
+          />
+          <TextField
+            label="Phone Number"
+            value={phone}
+            onChange={e => setPhone(e.target.value)}
+            required
+            fullWidth
+          />
+          <TextField
+            label="Location"
+            value={location}
+            onChange={e => setLocation(e.target.value)}
             required
             fullWidth
           />

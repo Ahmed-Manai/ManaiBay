@@ -13,8 +13,15 @@ def get_cassandra_session():
     session.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY,
+        first_name TEXT,
+        last_name TEXT,
         email TEXT,
-        hashed_password TEXT
+        hashed_password TEXT,
+        phone TEXT,
+        location TEXT,
+        role TEXT,
+        created_date TEXT,
+        updated_date TEXT
     );
     ''')
     return session

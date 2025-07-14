@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 // Base URL for API requests
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL =
+  window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : `http://${window.location.hostname}:8000`;
 
 // Create an Axios instance with base URL
 const api = axios.create({
@@ -34,5 +37,7 @@ api.createClient = (data) => api.post('/clients/', data);
 api.deleteClient = (id) => api.delete(`/clients/${id}`);
 // Update a client by ID
 api.updateClient = (id, data) => api.put(`/clients/${id}`, data);
+
+api.deleteUser = (id) => api.delete(`/users/${id}`);
 
 export default api;

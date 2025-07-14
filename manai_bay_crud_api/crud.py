@@ -1,7 +1,31 @@
 
 # CRUD operations for Client entity
-from uuid import uuid4
-from schemas import ClientCreate, Client
+from uuid import uuid4, UUID
+from schemas import ClientCreate, Client, UserOut
+def get_users(session) -> list[UserOut]:
+    """
+    Retrieve all registered users from the database.
+    Args:
+        session: Cassandra session.
+    Returns:
+        list[UserOut]: List of all registered users.
+    """
+    results = session.execute("SELECT id, first_name, last_name, email, phone, location, role, created_date, updated_date FROM users")
+    users = []
+    for row in results:
+        user_dict = {
+            "id": row.id,
+            "first_name": getattr(row, "first_name", "") or "",
+            "last_name": getattr(row, "last_name", "") or "",
+            "email": getattr(row, "email", "") or "",
+            "phone": getattr(row, "phone", "") or "",
+            "location": getattr(row, "location", "") or "",
+            "role": getattr(row, "role", None) or "user",
+            "created_date": getattr(row, "created_date", "") or "",
+            "updated_date": getattr(row, "updated_date", "") or ""
+        }
+        users.append(user_dict)
+    return users
 from cassandra.query import SimpleStatement
 
 def create_client(data: ClientCreate, session) -> Client:
