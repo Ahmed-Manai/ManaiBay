@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { createClient, updateClient } from '../api/clientApi';
+import api from '../api/clientApi';
 import {
   Box, TextField, Button, Typography, Stack
 } from '@mui/material';
@@ -18,10 +18,10 @@ const ClientForm = ({ onCreated, editClient, clearEdit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (editClient) {
-      await updateClient(editClient.id, { name, email });
+      await api.updateClient(editClient.id, { name, email });
       clearEdit();
     } else {
-      await createClient({ name, email });
+      await api.createClient({ name, email });
     }
     setName('');
     setEmail('');

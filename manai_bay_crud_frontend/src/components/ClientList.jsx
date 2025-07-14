@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getClients, deleteClient } from '../api/clientApi';
+import api from '../api/clientApi';
 import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, IconButton, Typography
@@ -11,7 +11,7 @@ const ClientList = ({ onEdit, refreshTrigger }) => {
   const [clients, setClients] = useState([]);
 
   const fetchClients = async () => {
-    const res = await getClients();
+    const res = await api.getClients();
     setClients(res.data);
   };
 
@@ -20,7 +20,7 @@ const ClientList = ({ onEdit, refreshTrigger }) => {
   }, [refreshTrigger]);
 
   const handleDelete = async (id) => {
-    await deleteClient(id);
+    await api.deleteClient(id);
     fetchClients();
   };
 
