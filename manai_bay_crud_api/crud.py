@@ -1,7 +1,71 @@
-
+from schemas import ProductCreate, ProductOut
+from datetime import datetime
 # CRUD operations for Client entity
 from uuid import uuid4, UUID
 from schemas import ClientCreate, Client, UserOut
+
+def create_product(data: ProductCreate, session) -> ProductOut:
+    id = uuid4()
+    now = datetime.utcnow().isoformat()
+    session.execute(
+        """
+        INSERT INTO products (id, title, description, image, price, created_date, updated_date)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """,
+        (id, data.title, data.description, data.image, float(data.price), now, now)
+    )
+    return ProductOut(id=id, title=data.title, description=data.description, image=data.image, price=float(data.price), created_date=now, updated_date=now)
+
+def get_product(product_id: UUID, session) -> ProductOut | None:
+    row = session.execute("SELECT * FROM products WHERE id=%s", (product_id,)).one()
+    if not row:
+        return None
+    return ProductOut(
+        id=row.id,
+        title=row.title,
+        description=row.description,
+        image=row.image,
+        price=row.price,
+        created_date=getattr(row, "created_date", None),
+        updated_date=getattr(row, "updated_date", None)
+    )
+
+def get_products(session) -> list[ProductOut]:
+    results = session.execute("SELECT * FROM products")
+    products = []
+    for row in results:
+        products.append(ProductOut(
+            id=row.id,
+            title=row.title,
+            description=row.description,
+            image=row.image,
+            price=row.price,
+            created_date=getattr(row, "created_date", None),
+            updated_date=getattr(row, "updated_date", None)
+        ))
+    return products
+
+def update_product(product_id: UUID, data: ProductCreate, session) -> ProductOut | None:
+    now = datetime.utcnow().isoformat()
+    row = session.execute("SELECT * FROM products WHERE id=%s", (product_id,)).one()
+    if not row:
+        return None
+    session.execute(
+        """
+        UPDATE products SET title=%s, description=%s, image=%s, price=%s, updated_date=%s WHERE id=%s
+        """,
+        (data.title, data.description, data.image, float(data.price), now, product_id)
+    )
+    return get_product(product_id, session)
+
+def delete_product(product_id: UUID, session) -> dict:
+    row = session.execute("SELECT * FROM products WHERE id=%s", (product_id,)).one()
+    if not row:
+        return {"detail": "Product not found"}
+    session.execute("DELETE FROM products WHERE id=%s", (product_id,))
+    return {"detail": "Product deleted"}
+
+
 def get_users(session) -> list[UserOut]:
     """
     Retrieve all registered users from the database.

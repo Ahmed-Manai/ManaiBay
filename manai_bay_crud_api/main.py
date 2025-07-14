@@ -1,3 +1,43 @@
+from schemas import ProductCreate, ProductOut
+from crud import create_product, get_product, get_products, update_product, delete_product
+
+from fastapi import Depends, FastAPI, HTTPException
+from schemas import ClientCreate, Client, UserCreate, UserLogin, UserOut
+from crud import create_client, get_client, get_clients, delete_client, get_users
+from auth import get_password_hash, create_access_token, authenticate_user, get_current_user, admin_required
+from database import get_cassandra_session
+from uuid import UUID, uuid4
+from fastapi.middleware.cors import CORSMiddleware
+
+
+app = FastAPI()  # Initialize FastAPI app
+
+# Product CRUD endpoints
+@app.get("/products/", response_model=list[ProductOut], summary="Get all products")
+def read_all_products(session=Depends(get_cassandra_session)):
+    return get_products(session)
+
+@app.get("/products/{product_id}", response_model=ProductOut, summary="Get product by ID")
+def read_product(product_id: UUID, session=Depends(get_cassandra_session)):
+    product = get_product(product_id, session)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+@app.post("/products/", response_model=ProductOut, summary="Create a new product")
+def create_new_product(data: ProductCreate, user=Depends(admin_required), session=Depends(get_cassandra_session)):
+    return create_product(data, session)
+
+@app.put("/products/{product_id}", response_model=ProductOut, summary="Update a product by ID")
+def update_existing_product(product_id: UUID, data: ProductCreate, user=Depends(admin_required), session=Depends(get_cassandra_session)):
+    product = update_product(product_id, data, session)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+@app.delete("/products/{product_id}", summary="Delete a product by ID")
+def delete_existing_product(product_id: UUID, user=Depends(admin_required), session=Depends(get_cassandra_session)):
+    return delete_product(product_id, session)
 
 from fastapi import Depends, FastAPI, HTTPException
 from schemas import ClientCreate, Client, UserCreate, UserLogin, UserOut

@@ -6,12 +6,12 @@ import { Card, CardMedia, CardContent, Typography, CardActions, Button } from '@
 
 
 // Card component for displaying a product
-const ProductCard = ({ product, onBuy }) => {
-  const navigate = useNavigate();
+
+const ProductCard = ({ product, onBuy, onEdit, onDelete, isAdmin, onProductClick }) => {
   return (
     <Card
       sx={{ maxWidth: 300, m: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }}
-      onClick={() => navigate(`/ecommerce/${product.id}`)}
+      onClick={e => { e.stopPropagation(); onProductClick(product); }}
     >
       <CardMedia
         component="img"
@@ -29,6 +29,12 @@ const ProductCard = ({ product, onBuy }) => {
         <Button variant="contained" color="primary" fullWidth onClick={e => { e.stopPropagation(); onBuy(product); }}>
           Buy
         </Button>
+        {isAdmin && (
+          <>
+            <Button variant="outlined" color="info" onClick={e => { e.stopPropagation(); onEdit(); }} sx={{ ml: 1 }}>Edit</Button>
+            <Button variant="outlined" color="error" onClick={e => { e.stopPropagation(); onDelete(); }} sx={{ ml: 1 }}>Delete</Button>
+          </>
+        )}
       </CardActions>
     </Card>
   );
@@ -37,6 +43,10 @@ const ProductCard = ({ product, onBuy }) => {
 ProductCard.propTypes = {
   product: PropTypes.object.isRequired,
   onBuy: PropTypes.func.isRequired,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+  isAdmin: PropTypes.bool,
+  onProductClick: PropTypes.func,
 };
 
 export default ProductCard;

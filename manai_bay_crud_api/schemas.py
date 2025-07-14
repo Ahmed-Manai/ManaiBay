@@ -1,5 +1,23 @@
+# Product schemas
+from typing import Optional
+from pydantic import BaseModel
+from uuid import uuid4, UUID
 
-# Pydantic models for request and response validation
+class ProductCreate(BaseModel):
+    title: str
+    description: str
+    image: str
+    price: float
+
+class ProductOut(BaseModel):
+    id: UUID
+    title: str
+    description: str
+    image: str
+    price: float
+    created_date: Optional[str]
+    updated_date: Optional[str]
+
 from pydantic import BaseModel, EmailStr
 from uuid import UUID
 

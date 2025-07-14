@@ -24,4 +24,16 @@ def get_cassandra_session():
         updated_date TEXT
     );
     ''')
+    # Ensure the products table exists
+    session.execute('''
+    CREATE TABLE IF NOT EXISTS products (
+        id UUID PRIMARY KEY,
+        title TEXT,
+        description TEXT,
+        image TEXT,
+        price DOUBLE,
+        created_date TEXT,
+        updated_date TEXT
+    );
+    ''')
     return session
