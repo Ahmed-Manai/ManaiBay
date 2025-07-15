@@ -1,16 +1,33 @@
-from schemas import ProductCreate, ProductOut
-from crud import create_product, get_product, get_products, update_product, delete_product
-
 from fastapi import Depends, FastAPI, HTTPException
-from schemas import ClientCreate, Client, UserCreate, UserLogin, UserOut
-from crud import create_client, get_client, get_clients, delete_client, get_users
-from auth import get_password_hash, create_access_token, authenticate_user, get_current_user, admin_required
-from database import get_cassandra_session
-from uuid import UUID, uuid4
 from fastapi.middleware.cors import CORSMiddleware
+from uuid import UUID, uuid4
+from datetime import datetime
 
+# Import schemas
+from schemas import ClientCreate, Client, UserCreate, UserLogin, UserOut, ProductCreate, ProductOut
+
+# Import CRUD functions
+from crud import (
+    create_client, get_client, get_clients, delete_client, get_users,
+    create_product, get_product, get_products, update_product, delete_product
+)
+
+# Import auth functions
+from auth import get_password_hash, create_access_token, authenticate_user, get_current_user, admin_required
+
+# Import database
+from database import get_cassandra_session
 
 app = FastAPI()  # Initialize FastAPI app
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Use "*" just for testing; restrict later
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Product CRUD endpoints
 @app.get("/products/", response_model=list[ProductOut], summary="Get all products")
@@ -39,24 +56,13 @@ def update_existing_product(product_id: UUID, data: ProductCreate, user=Depends(
 def delete_existing_product(product_id: UUID, user=Depends(admin_required), session=Depends(get_cassandra_session)):
     return delete_product(product_id, session)
 
-from fastapi import Depends, FastAPI, HTTPException
-from schemas import ClientCreate, Client, UserCreate, UserLogin, UserOut
-from crud import create_client, get_client, get_clients, delete_client, get_users
-from auth import get_password_hash, create_access_token, authenticate_user, get_current_user, admin_required
-from database import get_cassandra_session
-from uuid import UUID, uuid4
-from fastapi.middleware.cors import CORSMiddleware
-
-
-
-app = FastAPI()  # Initialize FastAPI app
+# User management endpoints
 @app.get("/users/", response_model=list[UserOut], summary="Get all registered users")
 def read_all_users(user=Depends(admin_required), session=Depends(get_cassandra_session)):
     """
     Get all registered users.
     Returns a list of all users registered via the register page.
     """
-
     try:
         users = get_users(session)
         return users
@@ -106,6 +112,7 @@ def update_user(user_id: UUID, data: UserCreate, user=Depends(admin_required), s
         updated_date=existing_user.updated_date
     )
 
+# Authentication endpoints
 @app.post("/register", response_model=UserOut, summary="Register a new user")
 def register(user: UserCreate, session=Depends(get_cassandra_session)):
     """
@@ -113,7 +120,6 @@ def register(user: UserCreate, session=Depends(get_cassandra_session)):
     Checks if the email is already registered, hashes the password, and inserts the user into the database.
     Returns the created user info.
     """
-    from datetime import datetime
     existing_user = session.execute(
         "SELECT * FROM users WHERE email=%s ALLOW FILTERING", (user.email,)
     ).one()
@@ -153,14 +159,7 @@ def login(user: UserLogin, session=Depends(get_cassandra_session)):
     access_token = create_access_token({"sub": db_user["email"], "role": db_user["role"]})
     return {"access_token": access_token, "token_type": "bearer", "role": db_user["role"]}
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Use "*" just for testing; restrict later
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+# Client CRUD endpoints
 @app.post("/clients/", response_model=Client, summary="Create a new client")
 def create(client: ClientCreate, user=Depends(get_current_user), session=Depends(get_cassandra_session)):
     """
