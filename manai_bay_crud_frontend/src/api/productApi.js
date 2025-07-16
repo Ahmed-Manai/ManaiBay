@@ -17,7 +17,13 @@ productApi.interceptors.request.use(config => {
   return config;
 });
 
-productApi.getProducts = () => productApi.get('/products/');
+productApi.getProducts = (searchTerm) => {
+  const params = {};
+  if (searchTerm) {
+    params.search = searchTerm;
+  }
+  return productApi.get('/products/', { params });
+};
 productApi.getProduct = (id) => productApi.get(`/products/${id}`);
 productApi.createProduct = (data) => productApi.post('/products/', data);
 productApi.updateProduct = (id, data) => productApi.put(`/products/${id}`, data);

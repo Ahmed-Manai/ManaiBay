@@ -1,30 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, CircularProgress, Alert, Pagination, Button, Box } from '@mui/material';
+import { Container, Typography, CircularProgress, Alert, Pagination, Button, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import ProductList from './ProductList';
-import ProductDetails from './ProductDetails';
 import AdminProductForm from './AdminProductForm';
+import SearchBar from './SearchBar';
 import { useCart } from './CartContext';
 import productApi from '../../api/productApi';
+import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 8;
 
 const EcommercePage = () => {
-  // Get user role from localStorage (set after login)
   const userRole = window.localStorage.getItem('role');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [adminFormOpen, setAdminFormOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [products, setProducts] = useState([]);
-  const { cart, dispatch } = useCart();
+  const { dispatch } = useCart();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const navigate = useNavigate();
 
-  // Fetch products from backend
-  useEffect(() => {
+  const fetchProducts = () => {
     setLoading(true);
     setError('');
-    productApi.getProducts()
+    productApi.getProducts(searchTerm)
       .then(res => {
         setProducts(res.data);
         setLoading(false);
@@ -33,10 +35,19 @@ const EcommercePage = () => {
         setError('Failed to fetch products');
         setLoading(false);
       });
-  }, [page]);
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [page, searchTerm]);
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setPage(1);
+  };
 
   const paginatedProducts = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  // Admin actions
+
   const handleAddProduct = () => {
     setEditProduct(null);
     setAdminFormOpen(true);
@@ -47,10 +58,17 @@ const EcommercePage = () => {
     setAdminFormOpen(true);
   };
 
-  const handleDeleteProduct = async (id) => {
+  const handleDeleteRequest = (id) => {
+    setProductToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
     try {
-      await productApi.deleteProduct(id);
-      setProducts(products.filter(p => p.id !== id));
+      await productApi.deleteProduct(productToDelete);
+      setProducts(products.filter(p => p.id !== productToDelete));
+      setDeleteDialogOpen(false);
+      setProductToDelete(null);
     } catch (err) {
       setError('Failed to delete product');
     }
@@ -59,14 +77,14 @@ const EcommercePage = () => {
   const handleAdminFormSubmit = async (product) => {
     try {
       if (editProduct) {
-        // Update
         const res = await productApi.updateProduct(editProduct.id, product);
         setProducts(products.map(p => p.id === editProduct.id ? res.data : p));
       } else {
-        // Add
         const res = await productApi.createProduct(product);
         setProducts([res.data, ...products]);
       }
+      setAdminFormOpen(false);
+      fetchProducts(); // Refetch products to show the latest data
     } catch (err) {
       setError('Failed to save product');
     }
@@ -77,23 +95,21 @@ const EcommercePage = () => {
     alert(`Added ${product.title} to cart!`);
   };
 
-  // Edit product when clicking on item (admin only)
   const handleProductClick = (product) => {
-    if (userRole === 'admin') {
-      handleEditProduct(product);
-    } else {
-      setSelectedProduct(product);
-    }
+    navigate(`/ecommerce/${product.id}`);
   };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>Shop Products</Typography>
-      <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
-        <Button variant="outlined" color="secondary" href="/">Back to Home</Button>
-        {userRole === 'admin' && (
-          <Button variant="contained" color="primary" onClick={handleAddProduct}>Add Product</Button>
-        )}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button variant="outlined" color="secondary" href="/">Back to Home</Button>
+          {userRole === 'admin' && (
+            <Button variant="contained" color="primary" onClick={handleAddProduct}>Add Product</Button>
+          )}
+        </Box>
+        <SearchBar onSearch={handleSearch} />
       </Box>
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
@@ -103,15 +119,14 @@ const EcommercePage = () => {
         <Alert severity="error">{error}</Alert>
       ) : (
         <>
-        <ProductList
-          products={paginatedProducts}
-          onBuy={handleBuy}
-          onEdit={userRole === 'admin' ? handleEditProduct : undefined}
-          onDelete={userRole === 'admin' ? handleDeleteProduct : undefined}
-          isAdmin={userRole === 'admin'}
-          onProductClick={handleProductClick}
-        />
-          {/* Admin product form dialog */}
+          <ProductList
+            products={paginatedProducts}
+            onBuy={handleBuy}
+            onEdit={userRole === 'admin' ? handleEditProduct : undefined}
+            onDelete={userRole === 'admin' ? handleDeleteRequest : undefined}
+            isAdmin={userRole === 'admin'}
+            onProductClick={handleProductClick}
+          />
           {userRole === 'admin' && (
             <AdminProductForm
               open={adminFormOpen}
@@ -120,6 +135,21 @@ const EcommercePage = () => {
               initialProduct={editProduct}
             />
           )}
+          <Dialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+          >
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to delete this product? This action cannot be undone.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleDeleteConfirm} color="error">Delete</Button>
+            </DialogActions>
+          </Dialog>
         </>
       )}
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -130,12 +160,6 @@ const EcommercePage = () => {
           color="primary"
         />
       </Box>
-      <ProductDetails
-        open={!!selectedProduct}
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-        onBuy={handleBuy}
-      />
     </Container>
   );
 };

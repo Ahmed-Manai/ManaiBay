@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/workspace/ManaiBay/manai_bay_crud_api/main.py", line 1, in <module>
+    from fastapi import Depends, FastAPI, HTTPException
+ModuleNotFoundError: No module named 'fastapi'
+Traceback (most recent call last):
+  File "/workspace/ManaiBay/manai_bay_crud_api/main.py", line 1, in <module>
+    from fastapi import Depends, FastAPI, HTTPException
+ModuleNotFoundError: No module named 'fastapi'

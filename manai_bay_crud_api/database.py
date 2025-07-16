@@ -30,10 +30,23 @@ def get_cassandra_session():
         id UUID PRIMARY KEY,
         title TEXT,
         description TEXT,
-        image TEXT,
+        image_data TEXT,
+        image_filename TEXT,
         price DOUBLE,
         created_date TEXT,
         updated_date TEXT
+    );
+    ''')
+    
+    # Ensure the product_reviews table exists
+    session.execute('''
+    CREATE TABLE IF NOT EXISTS product_reviews (
+        id UUID PRIMARY KEY,
+        product_id UUID,
+        user_name TEXT,
+        rating INT,
+        comment TEXT,
+        created_date TEXT
     );
     ''')
     return session

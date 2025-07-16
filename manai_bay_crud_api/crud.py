@@ -1,4 +1,4 @@
-from schemas import ProductCreate, ProductOut
+from schemas import ProductCreate, ProductOut, ProductUpdate, ReviewCreate, ReviewOut
 from datetime import datetime
 # CRUD operations for Client entity
 from uuid import uuid4, UUID
@@ -9,61 +9,158 @@ def create_product(data: ProductCreate, session) -> ProductOut:
     now = datetime.utcnow().isoformat()
     session.execute(
         """
-        INSERT INTO products (id, title, description, image, price, created_date, updated_date)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO products (id, title, description, image_data, image_filename, price, created_date, updated_date)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """,
-        (id, data.title, data.description, data.image, float(data.price), now, now)
+        (id, data.title, data.description, data.image_data, data.image_filename, float(data.price), now, now)
     )
-    return ProductOut(id=id, title=data.title, description=data.description, image=data.image, price=float(data.price), created_date=now, updated_date=now)
+    return ProductOut(
+        id=id, 
+        title=data.title, 
+        description=data.description, 
+        image_data=data.image_data,
+        image_filename=data.image_filename,
+        price=float(data.price), 
+        created_date=now, 
+        updated_date=now,
+        reviews=[]
+    )
+
+def get_product_reviews(product_id: UUID, session) -> list[ReviewOut]:
+    results = session.execute("SELECT * FROM product_reviews WHERE product_id=%s ALLOW FILTERING", (product_id,))
+    reviews = []
+    for row in results:
+        reviews.append(ReviewOut(
+            id=row.id,
+            product_id=row.product_id,
+            user_name=row.user_name,
+            rating=row.rating,
+            comment=row.comment,
+            created_date=row.created_date
+        ))
+    return reviews
 
 def get_product(product_id: UUID, session) -> ProductOut | None:
     row = session.execute("SELECT * FROM products WHERE id=%s", (product_id,)).one()
     if not row:
         return None
+    
+    reviews = get_product_reviews(product_id, session)
+    
     return ProductOut(
         id=row.id,
         title=row.title,
         description=row.description,
-        image=row.image,
+        image_data=getattr(row, "image_data", None),
+        image_filename=getattr(row, "image_filename", None),
         price=row.price,
         created_date=getattr(row, "created_date", None),
-        updated_date=getattr(row, "updated_date", None)
+        updated_date=getattr(row, "updated_date", None),
+        reviews=reviews
     )
 
-def get_products(session) -> list[ProductOut]:
-    results = session.execute("SELECT * FROM products")
-    products = []
-    for row in results:
-        products.append(ProductOut(
+def get_products(session, search: str = None) -> list[ProductOut]:
+    if search:
+        # This is not efficient for Cassandra, but for the sake of the example, we will use it.
+        # In a real-world scenario, you would use a search index like Elasticsearch or a secondary index in Cassandra.
+        query = "SELECT * FROM products"
+        results = session.execute(query)
+        products = [
+            product for product in results
+            if search.lower() in product.title.lower()
+        ]
+    else:
+        query = "SELECT * FROM products"
+        results = session.execute(query)
+        products = list(results)
+
+    output = []
+    for row in products:
+        reviews = get_product_reviews(row.id, session)
+        output.append(ProductOut(
             id=row.id,
             title=row.title,
             description=row.description,
-            image=row.image,
+            image_data=getattr(row, "image_data", None),
+            image_filename=getattr(row, "image_filename", None),
             price=row.price,
             created_date=getattr(row, "created_date", None),
-            updated_date=getattr(row, "updated_date", None)
+            updated_date=getattr(row, "updated_date", None),
+            reviews=reviews
         ))
-    return products
+    return output
 
-def update_product(product_id: UUID, data: ProductCreate, session) -> ProductOut | None:
+def update_product(product_id: UUID, data: ProductUpdate, session) -> ProductOut | None:
     now = datetime.utcnow().isoformat()
     row = session.execute("SELECT * FROM products WHERE id=%s", (product_id,)).one()
     if not row:
         return None
-    session.execute(
-        """
-        UPDATE products SET title=%s, description=%s, image=%s, price=%s, updated_date=%s WHERE id=%s
-        """,
-        (data.title, data.description, data.image, float(data.price), now, product_id)
-    )
+    
+    # Build update query dynamically based on provided fields
+    update_fields = []
+    update_values = []
+    
+    if data.title is not None:
+        update_fields.append("title=%s")
+        update_values.append(data.title)
+    if data.description is not None:
+        update_fields.append("description=%s")
+        update_values.append(data.description)
+    if data.image_data is not None:
+        update_fields.append("image_data=%s")
+        update_values.append(data.image_data)
+    if data.image_filename is not None:
+        update_fields.append("image_filename=%s")
+        update_values.append(data.image_filename)
+    if data.price is not None:
+        update_fields.append("price=%s")
+        update_values.append(float(data.price))
+    
+    update_fields.append("updated_date=%s")
+    update_values.append(now)
+    update_values.append(product_id)
+    
+    query = f"UPDATE products SET {', '.join(update_fields)} WHERE id=%s"
+    session.execute(query, update_values)
+    
     return get_product(product_id, session)
 
 def delete_product(product_id: UUID, session) -> dict:
     row = session.execute("SELECT * FROM products WHERE id=%s", (product_id,)).one()
     if not row:
         return {"detail": "Product not found"}
+    
+    # Delete associated reviews first
+    session.execute("DELETE FROM product_reviews WHERE product_id=%s", (product_id,))
+    # Delete the product
     session.execute("DELETE FROM products WHERE id=%s", (product_id,))
     return {"detail": "Product deleted"}
+
+def create_review(product_id: UUID, data: ReviewCreate, session) -> ReviewOut:
+    review_id = uuid4()
+    now = datetime.utcnow().isoformat()
+    session.execute(
+        """
+        INSERT INTO product_reviews (id, product_id, user_name, rating, comment, created_date)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """,
+        (review_id, product_id, data.user_name, data.rating, data.comment, now)
+    )
+    return ReviewOut(
+        id=review_id,
+        product_id=product_id,
+        user_name=data.user_name,
+        rating=data.rating,
+        comment=data.comment,
+        created_date=now
+    )
+
+def delete_review(review_id: UUID, session) -> dict:
+    row = session.execute("SELECT * FROM product_reviews WHERE id=%s", (review_id,)).one()
+    if not row:
+        return {"detail": "Review not found"}
+    session.execute("DELETE FROM product_reviews WHERE id=%s", (review_id,))
+    return {"detail": "Review deleted"}
 
 
 def get_users(session) -> list[UserOut]:

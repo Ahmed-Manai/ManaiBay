@@ -1,22 +1,45 @@
 # Product schemas
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 from uuid import uuid4, UUID
 
 class ProductCreate(BaseModel):
     title: str
     description: str
-    image: str
+    image_data: Optional[str] = None  # Base64 encoded image data
+    image_filename: Optional[str] = None
     price: float
+
+class ProductUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    image_data: Optional[str] = None
+    image_filename: Optional[str] = None
+    price: Optional[float] = None
+
+class ReviewCreate(BaseModel):
+    user_name: str
+    rating: int
+    comment: str
+
+class ReviewOut(BaseModel):
+    id: UUID
+    product_id: UUID
+    user_name: str
+    rating: int
+    comment: str
+    created_date: str
 
 class ProductOut(BaseModel):
     id: UUID
     title: str
     description: str
-    image: str
+    image_data: Optional[str] = None
+    image_filename: Optional[str] = None
     price: float
     created_date: Optional[str]
     updated_date: Optional[str]
+    reviews: Optional[List[ReviewOut]] = []
 
 from pydantic import BaseModel, EmailStr
 from uuid import UUID
