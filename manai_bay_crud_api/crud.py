@@ -131,7 +131,9 @@ def delete_product(product_id: UUID, session) -> dict:
         return {"detail": "Product not found"}
     
     # Delete associated reviews first
-    session.execute("DELETE FROM product_reviews WHERE product_id=%s", (product_id,))
+    reviews = get_product_reviews(product_id, session)
+    for review in reviews:
+        session.execute("DELETE FROM product_reviews WHERE id=%s", (review.id,))
     # Delete the product
     session.execute("DELETE FROM products WHERE id=%s", (product_id,))
     return {"detail": "Product deleted"}

@@ -23,7 +23,7 @@ const ProductCard = ({ product, onBuy, onDelete, isAdmin, onProductClick }) => {
       <CardMedia
         component="img"
         height="180"
-        image={product.image}
+        image={`data:image/jpeg;base64,${product.image_data}`}
         alt={product.title}
         sx={{ objectFit: 'cover' }}
       />
