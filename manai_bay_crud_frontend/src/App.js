@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Typography } from '@mui/material';
+import { Container, Typography, CssBaseline } from '@mui/material';
 import ClientForm from './components/ClientForm';
 import ClientList from './components/ClientList';
 import LoginForm from './components/LoginForm';
@@ -40,6 +40,7 @@ function App() {
   if (!token) {
     return (
       <>
+        <CssBaseline />
         <Header onLogout={handleLogout} />
         <div style={{ maxWidth: 400, margin: '2rem auto' }}>
           {showRegister ? (
@@ -102,6 +103,7 @@ function App() {
   if (role === 'admin') {
     return (
       <>
+        <CssBaseline />
         <Header onLogout={handleLogout} />
         <Container maxWidth="md" sx={{ py: 4 }}>
           <Typography variant="h4" gutterBottom>
@@ -124,6 +126,7 @@ function App() {
   // Normal user: show E-commerce page (replace with your actual component)
   return (
     <>
+      <CssBaseline />
       <Header onLogout={handleLogout} />
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Typography variant="h4" gutterBottom>

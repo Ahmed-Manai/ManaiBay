@@ -78,7 +78,7 @@ const Header = ({ onSearch, onLogout }) => {
         </Typography>
         {/* Navigation Buttons */}
         {window.localStorage.getItem('role') === 'admin' && (
-          <Button color="inherit" component={Link} to="/">
+          <Button color="inherit" component={Link} to="/clients">
             Clients
           </Button>
         )}

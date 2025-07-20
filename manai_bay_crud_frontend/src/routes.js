@@ -25,6 +25,14 @@ const AppRoutes = () => (
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/clients"
+          element={
+            <ProtectedRoute>
+              <App />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/ecommerce" element={<ProtectedRoute><EcommercePage /></ProtectedRoute>} />
         <Route path="/ecommerce/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />

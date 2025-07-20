@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCart } from './CartContext';
-import { Container, Typography, Button, Grid, Paper, IconButton, Box } from '@mui/material';
+import { Container, Typography, Button, Grid, Paper, IconButton, Box, CssBaseline } from '@mui/material';
 import { Add, Remove, Delete } from '@mui/icons-material';
 import Header from './Header';
 
@@ -28,6 +28,7 @@ const CartPage = () => {
 
   return (
     <>
+      <CssBaseline />
       <Header />
       <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>

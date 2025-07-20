@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, TextField, Button, Box, Paper, Grid, CircularProgress, Alert } from '@mui/material';
+import { Container, Typography, TextField, Button, Box, Paper, Grid, CircularProgress, Alert, CssBaseline } from '@mui/material';
 import clientApi from '../api/clientApi';
 import Header from './ecommerce/Header';
 
@@ -79,6 +79,7 @@ const AccountPage = () => {
 
   return (
     <>
+      <CssBaseline />
       <Header />
       <Container maxWidth="md" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
