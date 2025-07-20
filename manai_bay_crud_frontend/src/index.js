@@ -5,6 +5,7 @@ import AppRoutes from './routes';
 import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from '@mui/material/styles';
 import { CustomThemeProvider, useTheme } from './themeContext';
+import I18nProvider from './i18nProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -19,9 +20,11 @@ const ThemedApp = () => {
 
 root.render(
   <React.StrictMode>
-    <CustomThemeProvider>
-      <ThemedApp />
-    </CustomThemeProvider>
+    <I18nProvider>
+      <CustomThemeProvider>
+        <ThemedApp />
+      </CustomThemeProvider>
+    </I18nProvider>
   </React.StrictMode>
 );
 

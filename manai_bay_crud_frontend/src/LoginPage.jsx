@@ -5,10 +5,12 @@ import RegisterForm from './components/RegisterForm';
 import Header from './components/ecommerce/Header';
 import Footer from './components/Footer';
 import { CssBaseline } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
   const [showRegister, setShowRegister] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleLogin = (token, role) => {
     if (role === 'admin') {
@@ -44,7 +46,7 @@ const LoginPage = () => {
                 onMouseOver={e => e.currentTarget.style.background = 'linear-gradient(90deg, #1565c0 0%, #1976d2 100%)'}
                 onMouseOut={e => e.currentTarget.style.background = 'linear-gradient(90deg, #1976d2 0%, #2196f3 100%)'}
               >
-                Back to Login
+                {t('back_to_login', 'Back to Login')}
               </button>
             </div>
           </>
@@ -69,15 +71,16 @@ const LoginPage = () => {
                 onMouseOver={e => e.currentTarget.style.background = 'linear-gradient(90deg, #1565c0 0%, #1976d2 100%)'}
                 onMouseOut={e => e.currentTarget.style.background = 'linear-gradient(90deg, #1976d2 0%, #2196f3 100%)'}
               >
-                Register
+                {t('register', 'Register')}
               </button>
             </div>
           </>
         )}
       </div>
+
       <Footer />
     </>
   );
-};
+}
 
 export default LoginPage;

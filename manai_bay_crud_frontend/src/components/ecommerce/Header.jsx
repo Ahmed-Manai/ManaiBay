@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Menu, MenuItem, Button, Switch, Tooltip } from '@mui/material';
+import { AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Menu, MenuItem, Button, Switch, Tooltip, Select, FormControl } from '@mui/material';
 import { Search, ShoppingCart, AccountCircle } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 import { useCart } from './CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../themeContext';
+import { useTranslation } from 'react-i18next';
 
 const SearchBar = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -51,6 +52,15 @@ const Header = ({ onSearch, onLogout, minimal }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const { t, i18n } = useTranslation();
+  const [lang, setLang] = useState(i18n.language || 'en');
+
+  const handleLangChange = (event) => {
+    const newLang = event.target.value;
+    setLang(newLang);
+    i18n.changeLanguage(newLang);
+    document.body.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+  };
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -79,23 +89,57 @@ const Header = ({ onSearch, onLogout, minimal }) => {
           ManaiBay
         </Typography>
         {/* Only show theme toggle on minimal (login/register) */}
+        {/* Only show theme toggle on minimal (login/register) */}
         {minimal ? (
-          <Tooltip title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-            <Switch checked={theme === 'dark'} onChange={toggleTheme} color="default" />
-          </Tooltip>
+          <>
+            <FormControl variant="standard" sx={{ minWidth: 80, mx: 1 }}>
+              <Select
+                value={lang}
+                onChange={handleLangChange}
+                disableUnderline
+                sx={{ color: 'white', fontWeight: 400, '& .MuiSelect-icon': { color: 'white' } }}
+                renderValue={(value) => {
+                  const flagStyle = { width: 22, height: 16, verticalAlign: 'middle', marginRight: 6 };
+                  switch (value) {
+                    case 'en':
+                      return <span><img src={require('../../assets/flags/gb.svg').default} alt="EN" style={flagStyle} />EN</span>;
+                    case 'fr':
+                      return <span><img src={require('../../assets/flags/fr.svg').default} alt="FR" style={flagStyle} />FR</span>;
+                    case 'ar':
+                      return <span><img src={require('../../assets/flags/tn.svg').default} alt="AR" style={flagStyle} />AR</span>;
+                    default:
+                      return value;
+                  }
+                }}
+              >
+                <MenuItem value="en">
+                  <img src={require('../../assets/flags/gb.svg').default} alt="EN" style={{ width: 22, height: 16, verticalAlign: 'middle', marginRight: 6 }} /> EN
+                </MenuItem>
+                <MenuItem value="fr">
+                  <img src={require('../../assets/flags/fr.svg').default} alt="FR" style={{ width: 22, height: 16, verticalAlign: 'middle', marginRight: 6 }} /> FR
+                </MenuItem>
+                <MenuItem value="ar">
+                  <img src={require('../../assets/flags/tn.svg').default} alt="AR" style={{ width: 22, height: 16, verticalAlign: 'middle', marginRight: 6 }} /> AR
+                </MenuItem>
+              </Select>
+            </FormControl>
+            <Tooltip title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+              <Switch checked={theme === 'dark'} onChange={toggleTheme} color="default" />
+            </Tooltip>
+          </>
         ) : (
           <>
             {/* Navigation Buttons */}
             {window.localStorage.getItem('role') === 'admin' && (
               <Button color="inherit" component={Link} to="/clients">
-                Clients
+                {t('clients', 'Clients')}
               </Button>
             )}
             <Button color="inherit" component={Link} to="/ecommerce">
-              E-Commerce
+              {t('shop', 'E-Commerce')}
             </Button>
             <Button color="inherit" component={Link} to="/cart">
-              Cart
+              {t('cart', 'Cart')}
             </Button>
             {/* Search Bar */}
             <SearchBar>
@@ -103,8 +147,8 @@ const Header = ({ onSearch, onLogout, minimal }) => {
                 <Search />
               </SearchIconWrapper>
               <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ 'aria-label': 'search' }}
+                placeholder={t('search', 'Search…')}
+                inputProps={{ 'aria-label': t('search', 'search') }}
                 onChange={(e) => onSearch(e.target.value)}
               />
             </SearchBar>
@@ -118,6 +162,7 @@ const Header = ({ onSearch, onLogout, minimal }) => {
                 <ShoppingCart />
               </Badge>
             </IconButton>
+            {/* Account Icon */}
             <IconButton color="inherit" onClick={handleMenu}>
               <AccountCircle />
             </IconButton>
@@ -135,8 +180,8 @@ const Header = ({ onSearch, onLogout, minimal }) => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={() => { navigate('/account'); handleClose(); }}>Account</MenuItem>
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              <MenuItem onClick={() => { navigate('/account'); handleClose(); }}>{t('account', 'Account')}</MenuItem>
+              <MenuItem onClick={handleLogout}>{t('logout', 'Logout')}</MenuItem>
             </Menu>
           </>
         )}

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import './i18n';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography, CssBaseline } from '@mui/material';
 import ClientForm from './components/ClientForm';

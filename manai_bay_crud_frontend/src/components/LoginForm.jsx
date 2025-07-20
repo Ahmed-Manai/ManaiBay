@@ -1,11 +1,13 @@
 
 // Login form component for user authentication
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import api from '../api/clientApi';
 import { Box, TextField, Button, Typography, Alert, Stack, Paper } from '@mui/material';
 
 const LoginForm = ({ onLogin }) => {
+  const { t } = useTranslation();
   // State for form fields and error handling
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,11 +36,11 @@ const LoginForm = ({ onLogin }) => {
     <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
       <Box component="form" onSubmit={handleSubmit}>
         <Typography variant="h5" align="center" gutterBottom>
-          Login
+          {t('login', 'Login')}
         </Typography>
         <Stack spacing={3}>
           <TextField
-            label="Email"
+            label={t('email', 'Email')}
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
@@ -47,7 +49,7 @@ const LoginForm = ({ onLogin }) => {
             autoFocus
           />
           <TextField
-            label="Password"
+            label={t('password', 'Password')}
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
@@ -62,9 +64,9 @@ const LoginForm = ({ onLogin }) => {
             size="large"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? t('logging_in', 'Logging in...') : t('login', 'Login')}
           </Button>
-          {error && <Alert severity="error">{error}</Alert>}
+          {error && <Alert severity="error">{t('invalid_credentials', error)}</Alert>}
         </Stack>
       </Box>
     </Paper>
