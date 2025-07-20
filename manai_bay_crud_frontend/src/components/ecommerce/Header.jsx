@@ -45,7 +45,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const Header = ({ onSearch, onLogout }) => {
+const Header = ({ onSearch, onLogout, minimal }) => {
   const { theme, toggleTheme } = useTheme();
   const { cart } = useCart();
   const navigate = useNavigate();
@@ -65,9 +65,11 @@ const Header = ({ onSearch, onLogout }) => {
       onLogout();
     } else {
       window.localStorage.clear();
-      navigate('/'); // Always go to login page after logout
+      navigate('/');
     }
     handleClose();
+    // Force a reload to reset AppBar state for login page
+    setTimeout(() => window.location.reload(), 100);
   };
 
   return (
@@ -76,59 +78,68 @@ const Header = ({ onSearch, onLogout }) => {
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
           ManaiBay
         </Typography>
-        {/* Navigation Buttons */}
-        {window.localStorage.getItem('role') === 'admin' && (
-          <Button color="inherit" component={Link} to="/clients">
-            Clients
-          </Button>
+        {/* Only show theme toggle on minimal (login/register) */}
+        {minimal ? (
+          <Tooltip title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+            <Switch checked={theme === 'dark'} onChange={toggleTheme} color="default" />
+          </Tooltip>
+        ) : (
+          <>
+            {/* Navigation Buttons */}
+            {window.localStorage.getItem('role') === 'admin' && (
+              <Button color="inherit" component={Link} to="/clients">
+                Clients
+              </Button>
+            )}
+            <Button color="inherit" component={Link} to="/ecommerce">
+              E-Commerce
+            </Button>
+            <Button color="inherit" component={Link} to="/cart">
+              Cart
+            </Button>
+            {/* Search Bar */}
+            <SearchBar>
+              <SearchIconWrapper>
+                <Search />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={(e) => onSearch(e.target.value)}
+              />
+            </SearchBar>
+            {/* Theme Toggle Switch */}
+            <Tooltip title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+              <Switch checked={theme === 'dark'} onChange={toggleTheme} color="default" />
+            </Tooltip>
+            {/* Cart Icon */}
+            <IconButton color="inherit" component={Link} to="/cart">
+              <Badge badgeContent={cartItemCount} color="secondary">
+                <ShoppingCart />
+              </Badge>
+            </IconButton>
+            <IconButton color="inherit" onClick={handleMenu}>
+              <AccountCircle />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={() => { navigate('/account'); handleClose(); }}>Account</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
+          </>
         )}
-        <Button color="inherit" component={Link} to="/ecommerce">
-          E-Commerce
-        </Button>
-        <Button color="inherit" component={Link} to="/cart">
-          Cart
-        </Button>
-        {/* Search Bar */}
-        <SearchBar>
-          <SearchIconWrapper>
-            <Search />
-          </SearchIconWrapper>
-          <StyledInputBase
-            placeholder="Search…"
-            inputProps={{ 'aria-label': 'search' }}
-            onChange={(e) => onSearch(e.target.value)}
-          />
-        </SearchBar>
-        {/* Theme Toggle Switch */}
-        <Tooltip title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-          <Switch checked={theme === 'dark'} onChange={toggleTheme} color="default" />
-        </Tooltip>
-        {/* Cart Icon */}
-        <IconButton color="inherit" component={Link} to="/cart">
-          <Badge badgeContent={cartItemCount} color="secondary">
-            <ShoppingCart />
-          </Badge>
-        </IconButton>
-        <IconButton color="inherit" onClick={handleMenu}>
-          <AccountCircle />
-        </IconButton>
-        <Menu
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem onClick={() => { navigate('/account'); handleClose(); }}>Account</MenuItem>
-          <MenuItem onClick={handleLogout}>Logout</MenuItem>
-        </Menu>
       </Toolbar>
     </AppBar>
   );

@@ -20,7 +20,7 @@ const LoginPage = () => {
   return (
     <>
       <CssBaseline />
-      <Header />
+      <Header minimal />
       <div style={{ maxWidth: 400, margin: '2rem auto' }}>
         {showRegister ? (
           <>

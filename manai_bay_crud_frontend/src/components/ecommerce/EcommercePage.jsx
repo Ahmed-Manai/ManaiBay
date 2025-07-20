@@ -111,7 +111,7 @@ const EcommercePage = () => {
         </Box>
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button variant="outlined" color="secondary" href="/">Back to Home</Button>
+            {/* <Button variant="outlined" color="secondary" href="/">Back to Home</Button> */}
             {userRole === 'admin' && (
               <Button variant="contained" color="primary" onClick={handleAddProduct}>Add Product</Button>
             )}
