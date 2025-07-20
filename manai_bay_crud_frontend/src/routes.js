@@ -1,26 +1,34 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import App from './App';
+import LoginPage from './LoginPage';
 import EcommercePage from './components/ecommerce/EcommercePage';
+import ProtectedRoute from './components/ProtectedRoute';
 import ProductDetailPage from './components/ecommerce/ProductDetailPage';
+import CartPage from './components/ecommerce/CartPage';
+import AccountPage from './components/AccountPage';
 import { CartProvider } from './components/ecommerce/CartContext';
 import { Button, Box } from '@mui/material';
 
-const Navigation = () => (
-  <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-    <Button component={Link} to="/" variant="outlined" color="primary">Clients</Button>
-    <Button component={Link} to="/ecommerce" variant="outlined" color="secondary">E-Commerce</Button>
-  </Box>
-);
 
 const AppRoutes = () => (
   <CartProvider>
     <Router>
-      <Navigation />
+      {/* Navigation moved to Header/AppBar */}
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/ecommerce" element={<EcommercePage />} />
-        <Route path="/ecommerce/:id" element={<ProductDetailPage />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route
+          path="/app"
+          element={
+            <ProtectedRoute>
+              <App />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/ecommerce" element={<ProtectedRoute><EcommercePage /></ProtectedRoute>} />
+        <Route path="/ecommerce/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
+        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+        <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
       </Routes>
     </Router>
   </CartProvider>

@@ -3,11 +3,25 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import AppRoutes from './routes';
 import reportWebVitals from './reportWebVitals';
+import { ThemeProvider } from '@mui/material/styles';
+import { CustomThemeProvider, useTheme } from './themeContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const ThemedApp = () => {
+  const { activeTheme } = useTheme();
+  return (
+    <ThemeProvider theme={activeTheme}>
+      <AppRoutes />
+    </ThemeProvider>
+  );
+};
+
 root.render(
   <React.StrictMode>
-    <AppRoutes />
+    <CustomThemeProvider>
+      <ThemedApp />
+    </CustomThemeProvider>
   </React.StrictMode>
 );
 

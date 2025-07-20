@@ -21,6 +21,7 @@ const LoginForm = ({ onLogin }) => {
       const res = await api.post('/login', { email, password });
       window.localStorage.setItem('token', res.data.access_token);
       window.localStorage.setItem('role', res.data.role);
+      window.localStorage.setItem('user_id', res.data.user_id);
       onLogin(res.data.access_token, res.data.role);
     } catch (err) {
       setError('Invalid credentials');

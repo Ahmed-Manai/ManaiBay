@@ -2,25 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import productApi from '../../api/productApi';
 import { useCart } from './CartContext';
-
 import {
   Container,
   Typography,
   CircularProgress,
+  Skeleton,
   Alert,
   Button,
   Box,
-  Card,
   CardMedia,
-  CardContent,
   Grid,
   TextField,
   Rating,
   Divider,
   Avatar,
   Paper,
+  ThemeProvider,
+  CssBaseline
 } from '@mui/material';
-
+// import { useTheme } from '../../themeContext';
+import Header from './Header';
 
 const StarRating = ({ rating }) => (
   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -32,7 +33,7 @@ const StarRating = ({ rating }) => (
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { dispatch } = useCart();
+  const { cart, dispatch } = useCart();
   const userRole = window.localStorage.getItem('role');
   const isAdmin = userRole === 'admin';
 
@@ -41,6 +42,8 @@ const ProductDetailPage = () => {
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editedProduct, setEditedProduct] = useState(null);
+  // const { theme, toggleTheme } = useTheme();
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     setLoading(true);
@@ -58,8 +61,8 @@ const ProductDetailPage = () => {
   }, [id]);
 
   const handleAddToCart = () => {
-    dispatch({ type: 'ADD_TO_CART', product });
-    alert(`Added ${product.title} to cart!`);
+    dispatch({ type: 'ADD_TO_CART', product, quantity });
+    alert(`Added ${quantity} of ${product.title} to cart!`);
   };
 
   const handleEditToggle = () => {
@@ -105,9 +108,24 @@ const ProductDetailPage = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-        <CircularProgress />
-      </Box>
+      <>
+        <CssBaseline />
+        <Header />
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={6}>
+              <Skeleton variant="rectangular" width="100%" height={500} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Skeleton height={60} />
+              <Skeleton height={40} />
+              <Skeleton />
+              <Skeleton />
+              <Skeleton />
+            </Grid>
+          </Grid>
+        </Container>
+      </>
     );
   }
 
@@ -124,135 +142,151 @@ const ProductDetailPage = () => {
     : 0;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Button variant="outlined" onClick={() => navigate(-1)} sx={{ mb: 2 }}>
-        Back to Products
-      </Button>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
-            <CardMedia
-              component="img"
-              height="500"
-              image={`data:image/jpeg;base64,${product.image_data}`}
-              alt={product.title}
-              sx={{ borderRadius: 2 }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            {isEditing ? (
-              <Box component="form" noValidate autoComplete="off">
-                <TextField
-                  fullWidth
-                  label="Title"
-                  name="title"
-                  value={editedProduct.title}
-                  onChange={handleInputChange}
-                  margin="normal"
-                />
-                <TextField
-                  fullWidth
-                  label="Description"
-                  name="description"
-                  value={editedProduct.description}
-                  onChange={handleInputChange}
-                  margin="normal"
-                  multiline
-                  rows={4}
-                />
-                <TextField
-                  fullWidth
-                  label="Price"
-                  name="price"
-                  type="number"
-                  value={editedProduct.price}
-                  onChange={handleInputChange}
-                  margin="normal"
-                />
-                <Button
-                  variant="contained"
-                  component="label"
-                  fullWidth
-                  sx={{ mt: 2, mb: 2 }}
-                >
-                  Upload Image
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onChange={handleFileChange}
+    <>
+      <CssBaseline />
+      <Header />
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Button variant="outlined" onClick={() => navigate(-1)}>
+              Back to Products
+            </Button>
+          </Box>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={6}>
+              <CardMedia
+                component="img"
+                height="500"
+                image={`data:image/jpeg;base64,${product.image_data}`}
+                alt={product.title}
+                sx={{ borderRadius: 2 }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              {isEditing ? (
+                <Box component="form" noValidate autoComplete="off">
+                  <TextField
+                    fullWidth
+                    label="Title"
+                    name="title"
+                    value={editedProduct.title}
+                    onChange={handleInputChange}
+                    margin="normal"
                   />
-                </Button>
-                <Box sx={{ mt: 2 }}>
-                  <Button variant="contained" color="primary" onClick={handleSave} sx={{ mr: 1 }}>
-                    Save
+                  <TextField
+                    fullWidth
+                    label="Description"
+                    name="description"
+                    value={editedProduct.description}
+                    onChange={handleInputChange}
+                    margin="normal"
+                    multiline
+                    rows={4}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Price"
+                    name="price"
+                    type="number"
+                    value={editedProduct.price}
+                    onChange={handleInputChange}
+                    margin="normal"
+                  />
+                  <Button
+                    variant="contained"
+                    component="label"
+                    fullWidth
+                    sx={{ mt: 2, mb: 2 }}
+                  >
+                    Upload Image
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
                   </Button>
-                  <Button variant="outlined" onClick={handleEditToggle}>
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            ) : (
-              <>
-                <Typography gutterBottom variant="h4" component="div">
-                  {product.title}
-                </Typography>
-                <StarRating rating={averageRating} />
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                  {product.description}
-                </Typography>
-                <Typography variant="h5" color="primary" sx={{ mb: 2 }}>
-                  ${product.price}
-                </Typography>
-                {isAdmin ? (
-                  <Box>
-                    <Button variant="outlined" color="info" onClick={handleEditToggle} sx={{ mr: 1 }}>
-                      Edit Product
+                  <Box sx={{ mt: 2 }}>
+                    <Button variant="contained" color="primary" onClick={handleSave} sx={{ mr: 1 }}>
+                      Save
                     </Button>
-                    <Button variant="outlined" color="error" onClick={handleDelete}>
-                      Delete Product
+                    <Button variant="outlined" onClick={handleEditToggle}>
+                      Cancel
                     </Button>
                   </Box>
-                ) : (
-                  <Button variant="contained" color="primary" onClick={handleAddToCart}>
-                    Add to Cart
-                  </Button>
-                )}
-              </>
-            )}
+                </Box>
+              ) : (
+                <>
+                  <Typography gutterBottom variant="h4" component="div">
+                    {product.title}
+                  </Typography>
+                  <StarRating rating={averageRating} />
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                    {product.description}
+                  </Typography>
+                  <Typography variant="h5" color="primary" sx={{ mb: 2 }}>
+                    ${product.price}
+                  </Typography>
+                  {isAdmin ? (
+                    <Box>
+                      <Button variant="outlined" color="info" onClick={handleEditToggle} sx={{ mr: 1 }}>
+                        Edit Product
+                      </Button>
+                      <Button variant="outlined" color="error" onClick={handleDelete}>
+                        Delete Product
+                      </Button>
+                    </Box>
+                  ) : (
+                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                      <TextField
+                        type="number"
+                        label="Quantity"
+                        value={quantity}
+                        onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+                        inputProps={{ min: 1 }}
+                        sx={{ width: '80px', mr: 2 }}
+                      />
+                      <Button variant="contained" color="primary" onClick={handleAddToCart}>
+                        Add to Cart
+                      </Button>
+                    </Box>
+                  )}
+                </>
+              )}
+            </Grid>
           </Grid>
-        </Grid>
-      </Paper>
+        </Paper>
 
-      <Box sx={{ mt: 5 }}>
-        <Typography variant="h5" gutterBottom>
-          Reviews ({product.reviews.length})
-        </Typography>
-        <Divider sx={{ mb: 3 }} />
-        {product.reviews.length > 0 ? (
-          product.reviews.map(review => (
-            <Paper key={review.id} elevation={2} sx={{ p: 3, mb: 3 }}>
-              <Grid container spacing={2}>
-                <Grid item>
-                  <Avatar>{review.user_name.charAt(0)}</Avatar>
+        <Box sx={{ mt: 5 }}>
+          <Typography variant="h5" gutterBottom>
+            Reviews ({product.reviews.length})
+          </Typography>
+          <Divider sx={{ mb: 3 }} />
+          {product.reviews.length > 0 ? (
+            product.reviews.map(review => (
+              <Paper key={review.id} elevation={2} sx={{ p: 3, mb: 3 }}>
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Avatar>{review.user_name.charAt(0)}</Avatar>
+                  </Grid>
+                  <Grid item xs>
+                    <Typography variant="subtitle1" component="div">
+                      {review.user_name}
+                    </Typography>
+                    <Rating value={review.rating} readOnly />
+                    <Typography variant="body2" color="text.secondary">
+                      {review.comment}
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs>
-                  <Typography variant="subtitle1" component="div">
-                    {review.user_name}
-                  </Typography>
-                  <Rating value={review.rating} readOnly />
-                  <Typography variant="body2" color="text.secondary">
-                    {review.comment}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          ))
-        ) : (
-          <Typography>No reviews yet.</Typography>
-        )}
-      </Box>
-    </Container>
+              </Paper>
+            ))
+          ) : (
+            <Typography>No reviews yet.</Typography>
+          )}
+        </Box>
+      </Container>
+    </>
   );
 };
 

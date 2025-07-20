@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, CircularProgress, Alert, Pagination, Button, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Container, Typography, CircularProgress, Alert, Pagination, Button, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ThemeProvider, CssBaseline, Skeleton, Grid } from '@mui/material';
 import ProductList from './ProductList';
 import AdminProductForm from './AdminProductForm';
-import SearchBar from './SearchBar';
+import Header from './Header';
 import { useCart } from './CartContext';
 import productApi from '../../api/productApi';
 import { useNavigate } from 'react-router-dom';
+// import { useTheme } from '../../themeContext';
 
 const PAGE_SIZE = 8;
 
@@ -17,11 +18,12 @@ const EcommercePage = () => {
   const [adminFormOpen, setAdminFormOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [products, setProducts] = useState([]);
-  const { dispatch } = useCart();
+  const { cart, dispatch } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const navigate = useNavigate();
+  // const { theme, toggleTheme } = useTheme();
 
   const fetchProducts = () => {
     setLoading(true);
@@ -100,67 +102,78 @@ const EcommercePage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>Shop Products</Typography>
-      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant="outlined" color="secondary" href="/">Back to Home</Button>
-          {userRole === 'admin' && (
-            <Button variant="contained" color="primary" onClick={handleAddProduct}>Add Product</Button>
-          )}
+    <>
+      <CssBaseline />
+      <Header onSearch={handleSearch} />
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h4" gutterBottom>Shop Products</Typography>
         </Box>
-        <SearchBar onSearch={handleSearch} />
-      </Box>
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <CircularProgress />
+        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button variant="outlined" color="secondary" href="/">Back to Home</Button>
+            {userRole === 'admin' && (
+              <Button variant="contained" color="primary" onClick={handleAddProduct}>Add Product</Button>
+            )}
+          </Box>
         </Box>
-      ) : error ? (
-        <Alert severity="error">{error}</Alert>
-      ) : (
-        <>
-          <ProductList
-            products={paginatedProducts}
-            onBuy={handleBuy}
-            onEdit={userRole === 'admin' ? handleEditProduct : undefined}
-            onDelete={userRole === 'admin' ? handleDeleteRequest : undefined}
-            isAdmin={userRole === 'admin'}
-            onProductClick={handleProductClick}
-          />
-          {userRole === 'admin' && (
-            <AdminProductForm
-              open={adminFormOpen}
-              onClose={() => setAdminFormOpen(false)}
-              onSubmit={handleAdminFormSubmit}
-              initialProduct={editProduct}
+        {loading ? (
+          <Grid container spacing={4}>
+            {Array.from(new Array(PAGE_SIZE)).map((_, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                <Skeleton variant="rectangular" width="100%" height={200} />
+                <Skeleton />
+                <Skeleton width="60%" />
+              </Grid>
+            ))}
+          </Grid>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : (
+          <>
+            <ProductList
+              products={paginatedProducts}
+              onBuy={handleBuy}
+              onEdit={userRole === 'admin' ? handleEditProduct : undefined}
+              onDelete={userRole === 'admin' ? handleDeleteRequest : undefined}
+              isAdmin={userRole === 'admin'}
+              onProductClick={handleProductClick}
             />
-          )}
-          <Dialog
-            open={deleteDialogOpen}
-            onClose={() => setDeleteDialogOpen(false)}
-          >
-            <DialogTitle>Confirm Deletion</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Are you sure you want to delete this product? This action cannot be undone.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleDeleteConfirm} color="error">Delete</Button>
-            </DialogActions>
-          </Dialog>
-        </>
-      )}
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <Pagination
-          count={Math.ceil(products.length / PAGE_SIZE)}
-          page={page}
-          onChange={(_, value) => setPage(value)}
-          color="primary"
-        />
-      </Box>
-    </Container>
+            {userRole === 'admin' && (
+              <AdminProductForm
+                open={adminFormOpen}
+                onClose={() => setAdminFormOpen(false)}
+                onSubmit={handleAdminFormSubmit}
+                initialProduct={editProduct}
+              />
+            )}
+            <Dialog
+              open={deleteDialogOpen}
+              onClose={() => setDeleteDialogOpen(false)}
+            >
+              <DialogTitle>Confirm Deletion</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  Are you sure you want to delete this product? This action cannot be undone.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleDeleteConfirm} color="error">Delete</Button>
+              </DialogActions>
+            </Dialog>
+          </>
+        )}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Pagination
+            count={Math.ceil(products.length / PAGE_SIZE)}
+            page={page}
+            onChange={(_, value) => setPage(value)}
+            color="primary"
+          />
+        </Box>
+      </Container>
+    </>
   );
 };
 

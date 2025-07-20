@@ -1,11 +1,18 @@
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardMedia, CardContent, Typography, CardActions, Button } from '@mui/material';
+import { Card, CardMedia, CardContent, Typography, CardActions, Button, Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-
-// Card component for displaying a product
+const StyledCard = styled(Card)(({ theme }) => ({
+  maxWidth: 345,
+  margin: 'auto',
+  transition: 'transform 0.3s, box-shadow 0.3s',
+  '&:hover': {
+    transform: 'scale(1.05)',
+    boxShadow: theme.shadows[10],
+  },
+}));
 
 const ProductCard = ({ product, onBuy, onDelete, isAdmin, onProductClick }) => {
   const navigate = useNavigate();
@@ -16,35 +23,38 @@ const ProductCard = ({ product, onBuy, onDelete, isAdmin, onProductClick }) => {
   };
 
   return (
-    <Card
-      sx={{ maxWidth: 300, m: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer' }}
-      onClick={() => onProductClick(product)}
-    >
+    <StyledCard onClick={() => onProductClick(product)}>
       <CardMedia
         component="img"
-        height="180"
+        height="200"
         image={`data:image/jpeg;base64,${product.image_data}`}
         alt={product.title}
         sx={{ objectFit: 'cover' }}
       />
       <CardContent>
-        <Typography variant="h6" gutterBottom>{product.title}</Typography>
-        <Typography variant="body2" color="text.secondary">{product.description}</Typography>
-        <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold' }}>${product.price}</Typography>
+        <Typography gutterBottom variant="h5" component="div">
+          {product.title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" noWrap>
+          {product.description}
+        </Typography>
+        <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
+          ${product.price}
+        </Typography>
       </CardContent>
-      <CardActions>
+      <CardActions sx={{ justifyContent: 'space-between', padding: '0 16px 16px' }}>
         {isAdmin ? (
           <>
-            <Button variant="outlined" color="info" onClick={handleEditClick} sx={{ ml: 1 }}>Edit</Button>
-            <Button variant="outlined" color="error" onClick={e => { e.stopPropagation(); onDelete(product.id); }} sx={{ ml: 1 }}>Delete</Button>
+            <Button variant="outlined" color="info" onClick={handleEditClick}>Edit</Button>
+            <Button variant="outlined" color="error" onClick={(e) => { e.stopPropagation(); onDelete(product.id); }}>Delete</Button>
           </>
         ) : (
-          <Button variant="contained" color="primary" fullWidth onClick={e => { e.stopPropagation(); onBuy(product); }}>
-            Buy
+          <Button variant="contained" color="primary" fullWidth onClick={(e) => { e.stopPropagation(); onBuy(product); }}>
+            Add to Cart
           </Button>
         )}
       </CardActions>
-    </Card>
+    </StyledCard>
   );
 };
 

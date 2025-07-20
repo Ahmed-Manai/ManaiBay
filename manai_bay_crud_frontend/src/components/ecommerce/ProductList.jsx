@@ -2,24 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Grid } from '@mui/material';
 import ProductCard from './ProductCard';
-import { Link } from 'react-router-dom';
-
-// Grid list of products
 
 const ProductList = ({ products, onBuy, onEdit, onDelete, isAdmin, onProductClick }) => (
-  <Grid container spacing={2} justifyContent="center">
+  <Grid container spacing={4} justifyContent="center">
     {products.map(product => (
       <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
-        <Link to={`/ecommerce/${product.id}`} style={{ textDecoration: 'none' }}>
-          <ProductCard
-            product={product}
-            onBuy={onBuy}
-            onEdit={isAdmin ? () => onEdit(product) : undefined}
-            onDelete={isAdmin ? () => onDelete(product.id) : undefined}
-            isAdmin={isAdmin}
-            onProductClick={() => onProductClick(product)}
-          />
-        </Link>
+        <ProductCard
+          product={product}
+          onBuy={onBuy}
+          onEdit={isAdmin ? () => onEdit(product) : undefined}
+          onDelete={isAdmin ? () => onDelete(product.id) : undefined}
+          isAdmin={isAdmin}
+          onProductClick={() => onProductClick(product)}
+        />
       </Grid>
     ))}
   </Grid>
