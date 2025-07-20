@@ -7,6 +7,7 @@ import ClientList from './components/ClientList';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import Header from './components/ecommerce/Header';
+import Footer from './components/Footer';
 
 
 function App() {
@@ -95,6 +96,7 @@ function App() {
             </>
           )}
         </div>
+        <Footer />
       </>
     );
   }
@@ -119,6 +121,7 @@ function App() {
             onEdit={(client) => setEditClient(client)}
           />
         </Container>
+        <Footer />
       </>
     );
   }
@@ -135,6 +138,7 @@ function App() {
         {/* Replace below with your actual E-commerce component */}
         <Typography variant="body1">Welcome to the E-commerce page!</Typography>
       </Container>
+      <Footer />
     </>
   );
 }

@@ -3,6 +3,7 @@ import { useCart } from './CartContext';
 import { Container, Typography, Button, Grid, Paper, IconButton, Box, CssBaseline } from '@mui/material';
 import { Add, Remove, Delete } from '@mui/icons-material';
 import Header from './Header';
+import Footer from '../Footer';
 
 const CartPage = () => {
   const { cart, dispatch } = useCart();
@@ -79,6 +80,7 @@ const CartPage = () => {
         </>
       )}
       </Container>
+      <Footer />
     </>
   );
 };

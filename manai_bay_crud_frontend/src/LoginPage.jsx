@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import Header from './components/ecommerce/Header';
+import Footer from './components/Footer';
 import { CssBaseline } from '@mui/material';
 
 const LoginPage = () => {
@@ -74,6 +75,7 @@ const LoginPage = () => {
           </>
         )}
       </div>
+      <Footer />
     </>
   );
 };

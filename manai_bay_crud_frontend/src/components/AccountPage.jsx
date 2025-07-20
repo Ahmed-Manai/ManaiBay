@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, TextField, Button, Box, Paper, Grid, CircularProgress, Alert, CssBaseline } from '@mui/material';
 import clientApi from '../api/clientApi';
 import Header from './ecommerce/Header';
+import Footer from './Footer';
 
 const AccountPage = () => {
   const [user, setUser] = useState({
@@ -182,6 +183,7 @@ const AccountPage = () => {
       {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
       {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
       </Container>
+      <Footer />
     </>
   );
 };
