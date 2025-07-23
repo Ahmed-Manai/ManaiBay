@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import api from '../api/clientApi';
 import { Box, TextField, Button, Typography, Alert, Stack, Paper } from '@mui/material';
-import LanguageSelector from './LanguageSelector';
 
 const RegisterForm = ({ onRegister }) => {
   const { t } = useTranslation();
@@ -66,9 +65,6 @@ const RegisterForm = ({ onRegister }) => {
 
   return (
     <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-        <LanguageSelector />
-      </Box>
       <Box component="form" onSubmit={handleSubmit}>
         <Typography variant="h5" align="center" gutterBottom>
           {t('register', 'Register')}
@@ -136,11 +132,11 @@ const RegisterForm = ({ onRegister }) => {
       </Box>
     </Paper>
   );
+}
 
 // Prop types for type safety
-
 RegisterForm.propTypes = {
   onRegister: PropTypes.func,
 };
-}
+
 export default RegisterForm;
