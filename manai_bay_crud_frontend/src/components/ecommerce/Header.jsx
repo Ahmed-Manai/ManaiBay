@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Menu, MenuItem, Button, Switch, Tooltip, Select, FormControl } from '@mui/material';
+import { AppBar, Toolbar, Typography, InputBase, IconButton, Badge, Menu, MenuItem, Button, Switch, Tooltip, Select, FormControl, Box } from '@mui/material';
 import { Search, ShoppingCart, AccountCircle } from '@mui/icons-material';
 import { styled, alpha } from '@mui/material/styles';
 import { useCart } from './CartContext';
@@ -88,10 +88,75 @@ const Header = ({ onSearch, onLogout, minimal }) => {
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
           ManaiBay
         </Typography>
-        {/* Only show theme toggle on minimal (login/register) */}
-        {/* Only show theme toggle on minimal (login/register) */}
+   {/* Remove duplicate language selector here, keep only the one next to theme toggle */}
+        {/* Theme toggle and page controls */}
         {minimal ? (
           <>
+            <Box sx={{ display: 'flex', alignItems: 'center', mx: 1 }}>
+
+              <FormControl variant="standard" sx={{ minWidth: 80, ml: 2 }}>
+                <Select
+                  value={lang}
+                  onChange={handleLangChange}
+                  disableUnderline
+                  sx={{ color: 'white', fontWeight: 400, '& .MuiSelect-icon': { color: 'white' } }}
+                  renderValue={(value) => {
+                    const flagStyle = { width: 22, height: 16, verticalAlign: 'middle', marginRight: 6 };
+                    switch (value) {
+                      case 'en':
+                        return <span><img src={require('../../assets/flags/gb.svg').default} alt="EN" style={flagStyle} />EN</span>;
+                      case 'fr':
+                        return <span><img src={require('../../assets/flags/fr.svg').default} alt="FR" style={flagStyle} />FR</span>;
+                      case 'ar':
+                        return <span><img src={require('../../assets/flags/tn.svg').default} alt="AR" style={flagStyle} />AR</span>;
+                      default:
+                        return value;
+                    }
+                  }}
+                >
+                  <MenuItem value="en">
+                    <img src={require('../../assets/flags/gb.svg').default} alt="EN" style={{ width: 22, height: 16, verticalAlign: 'middle', marginRight: 6 }} /> EN
+                  </MenuItem>
+                  <MenuItem value="fr">
+                    <img src={require('../../assets/flags/fr.svg').default} alt="FR" style={{ width: 22, height: 16, verticalAlign: 'middle', marginRight: 6 }} /> FR
+                  </MenuItem>
+                  <MenuItem value="ar">
+                    <img src={require('../../assets/flags/tn.svg').default} alt="AR" style={{ width: 22, height: 16, verticalAlign: 'middle', marginRight: 6 }} /> AR
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+                <Tooltip title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+                <Switch checked={theme === 'dark'} onChange={toggleTheme} color="default" />
+              </Tooltip>
+            </Box>
+          </>
+        ) : (
+          <>
+            {/* Navigation Buttons */}
+            {window.localStorage.getItem('role') === 'admin' && (
+              <Button color="inherit" component={Link} to="/clients">
+                {t('clients', 'Clients')}
+              </Button>
+            )}
+            <Button color="inherit" component={Link} to="/ecommerce">
+              {t('shop', 'E-Commerce')}
+            </Button>
+            <Button color="inherit" component={Link} to="/cart">
+              {t('cart', 'Cart')}
+            </Button>
+            {/* Search Bar */}
+            <SearchBar>
+              <SearchIconWrapper>
+                <Search />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder={t('search', 'Search…')}
+                inputProps={{ 'aria-label': t('search', 'search') }}
+                onChange={(e) => onSearch(e.target.value)}
+              />
+            </SearchBar>
+                    {/* Always show language selector */}
             <FormControl variant="standard" sx={{ minWidth: 80, mx: 1 }}>
               <Select
                 value={lang}
@@ -123,35 +188,6 @@ const Header = ({ onSearch, onLogout, minimal }) => {
                 </MenuItem>
               </Select>
             </FormControl>
-            <Tooltip title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-              <Switch checked={theme === 'dark'} onChange={toggleTheme} color="default" />
-            </Tooltip>
-          </>
-        ) : (
-          <>
-            {/* Navigation Buttons */}
-            {window.localStorage.getItem('role') === 'admin' && (
-              <Button color="inherit" component={Link} to="/clients">
-                {t('clients', 'Clients')}
-              </Button>
-            )}
-            <Button color="inherit" component={Link} to="/ecommerce">
-              {t('shop', 'E-Commerce')}
-            </Button>
-            <Button color="inherit" component={Link} to="/cart">
-              {t('cart', 'Cart')}
-            </Button>
-            {/* Search Bar */}
-            <SearchBar>
-              <SearchIconWrapper>
-                <Search />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder={t('search', 'Search…')}
-                inputProps={{ 'aria-label': t('search', 'search') }}
-                onChange={(e) => onSearch(e.target.value)}
-              />
-            </SearchBar>
             {/* Theme Toggle Switch */}
             <Tooltip title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
               <Switch checked={theme === 'dark'} onChange={toggleTheme} color="default" />
