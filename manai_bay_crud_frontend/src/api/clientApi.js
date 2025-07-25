@@ -3,8 +3,8 @@ import axios from 'axios';
 // Base URL for API requests
 const BASE_URL =
   window.location.hostname === 'localhost'
-    ? 'https://poverty-myanmar-potatoes-sf.trycloudflare.com'
-    : `https://poverty-myanmar-potatoes-sf.trycloudflare.com`;
+    ? 'https://nn-ee-breakdown-cult.trycloudflare.com'
+    : `https://nn-ee-breakdown-cult.trycloudflare.com`;
 
 // Create an Axios instance with base URL
 const api = axios.create({
