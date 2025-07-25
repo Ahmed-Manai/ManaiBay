@@ -85,9 +85,12 @@ const Header = ({ onSearch, onLogout, minimal }) => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
-          ManaiBay
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+          <img src={require('../../assets/1-2 - Copy.png')} alt="ManaiBay Logo" style={{ width: 36, height: 36, marginRight: 10, borderRadius: 8, boxShadow: '0 2px 8px rgba(25, 118, 210, 0.10)' }} />
+          <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 700, letterSpacing: 1 }}>
+            ManaiBay
+          </Typography>
+        </Box>
    {/* Remove duplicate language selector here, keep only the one next to theme toggle */}
         {/* Theme toggle and page controls */}
         {minimal ? (

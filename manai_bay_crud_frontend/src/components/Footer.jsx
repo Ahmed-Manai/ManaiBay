@@ -37,37 +37,28 @@ const Footer = () => {
       bottom: 0,
       width: '100%',
       zIndex: 1300,
-      py: 1,
-      px: 2,
-      minHeight: 40,
-      background: footerBg,
+      py: 0.5,
+      px: 1.5,
+      minHeight: 28,
+      background: 'rgba(25, 118, 210, 0.98)',
       color: 'white',
-      borderTopLeftRadius: 0,
-      borderTopRightRadius: 0,
-      boxShadow: '0 -2px 12px rgba(0,0,0,0.08)',
-      textAlign: 'center',
-      fontSize: 14,
+      boxShadow: '0 -1px 8px rgba(25,118,210,0.08)',
+      fontSize: 13,
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center',
-      gap: 2,
+      justifyContent: 'space-between',
+      gap: 1,
     }}>
-      <Typography variant="body2" sx={{ opacity: 0.7, mr: 2 }}>
-        © {new Date().getFullYear()} All rights reserved.
+      <Typography variant="caption" sx={{ opacity: 0.7, ml: 1 }}>
+        © {new Date().getFullYear()} ManaiBay
       </Typography>
-      <Link href="mailto:contact@manaibay.com" color="inherit" underline="hover" sx={{ mx: 1 }}>
-        Contact
-      </Link>
-      <Link href="/privacy" color="inherit" underline="hover" sx={{ mx: 1 }}>
-        Privacy Policy
-      </Link>
-      <Link href="/terms" color="inherit" underline="hover" sx={{ mx: 1 }}>
-        Terms of Use
-      </Link>
-      <Stack direction="row" spacing={1} sx={{ ml: 2 }}>
-        <IconButton color="inherit" href="https://facebook.com" target="_blank" size="small"><FacebookIcon fontSize="small" /></IconButton>
-        <IconButton color="inherit" href="https://twitter.com" target="_blank" size="small"><TwitterIcon fontSize="small" /></IconButton>
-        <IconButton color="inherit" href="https://instagram.com" target="_blank" size="small"><InstagramIcon fontSize="small" /></IconButton>
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Link href="mailto:contact@manaibay.com" color="inherit" underline="hover" sx={{ fontSize: 13, opacity: 0.8 }}>
+          Contact
+        </Link>
+        <IconButton color="inherit" href="https://facebook.com" target="_blank" size="small" sx={{ p: 0.5, mx: 0.2 }}><FacebookIcon fontSize="small" /></IconButton>
+        <IconButton color="inherit" href="https://twitter.com" target="_blank" size="small" sx={{ p: 0.5, mx: 0.2 }}><TwitterIcon fontSize="small" /></IconButton>
+        <IconButton color="inherit" href="https://instagram.com" target="_blank" size="small" sx={{ p: 0.5, mx: 0.2 }}><InstagramIcon fontSize="small" /></IconButton>
       </Stack>
     </Box>
   );

@@ -5,6 +5,7 @@ const resources = {
   en: {
     translation: {
       welcome: 'Welcome',
+      welcome_to_manaibay: 'Welcome to ManaiBay',
       login: 'Login',
       register: 'Register',
       logout: 'Logout',
@@ -23,6 +24,7 @@ const resources = {
   fr: {
     translation: {
       welcome: 'Bienvenue',
+      welcome_to_manaibay: 'Bienvenue à ManaiBay',
       login: 'Connexion',
       register: 'S\'inscrire',
       logout: 'Déconnexion',
@@ -41,6 +43,7 @@ const resources = {
   ar: {
     translation: {
       welcome: 'مرحبا',
+      welcome_to_manaibay: 'مرحبا بكم في ManaiBay',
       login: 'تسجيل الدخول',
       register: 'تسجيل',
       logout: 'تسجيل الخروج',

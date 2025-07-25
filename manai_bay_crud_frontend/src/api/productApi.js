@@ -2,8 +2,8 @@ import axios from 'axios';
 
 const BASE_URL =
   window.location.hostname === 'localhost'
-    ? 'http://localhost:8000'
-    : `http://${window.location.hostname}:8000`;
+    ? 'https://poverty-myanmar-potatoes-sf.trycloudflare.com'
+    : `https://poverty-myanmar-potatoes-sf.trycloudflare.com`;
 
 const productApi = axios.create({
   baseURL: BASE_URL,

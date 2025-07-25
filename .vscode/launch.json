@@ -14,7 +14,7 @@
             "cwd": "${workspaceFolder}/manai_bay_crud_api",
         },
         {
-        "name": "React App (Chrome)",
+        "name": "ManaiBay (Chrome)",
         "type": "chrome",
         "request": "launch",
         "url": "http://localhost:3000",
