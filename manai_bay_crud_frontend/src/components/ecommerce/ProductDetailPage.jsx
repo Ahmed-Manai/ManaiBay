@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 // import { useTheme } from '../../themeContext';
 import Header from './Header';
+import Footer from '../Footer';
 
 const StarRating = ({ rating }) => (
   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -286,6 +287,8 @@ const ProductDetailPage = () => {
           )}
         </Box>
       </Container>
+      <div style={{ height: 32 }} />
+      <Footer />
     </>
   );
 };

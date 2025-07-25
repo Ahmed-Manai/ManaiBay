@@ -9,6 +9,8 @@ const Footer = () => {
   const footerBg = theme.palette.mode === 'dark'
     ? theme.palette.primary.dark
     : theme.palette.primary.main;
+
+
   const [showFooter, setShowFooter] = useState(false);
 
   useEffect(() => {
@@ -16,8 +18,8 @@ const Footer = () => {
       const scrollY = window.scrollY || window.pageYOffset;
       const windowHeight = window.innerHeight;
       const bodyHeight = document.body.scrollHeight;
-      // Only show if page is scrollable and user has scrolled down
-      if (bodyHeight > windowHeight && scrollY > 20) {
+      // Show footer only when scrolled to the bottom
+      if (scrollY + windowHeight >= bodyHeight - 2) {
         setShowFooter(true);
       } else {
         setShowFooter(false);

@@ -3,6 +3,7 @@ import { Container, Typography, CircularProgress, Alert, Pagination, Button, Box
 import ProductList from './ProductList';
 import AdminProductForm from './AdminProductForm';
 import Header from './Header';
+import Footer from '../Footer';
 import { useCart } from './CartContext';
 import productApi from '../../api/productApi';
 import { useNavigate } from 'react-router-dom';
@@ -107,7 +108,7 @@ const EcommercePage = () => {
       <Header onSearch={handleSearch} />
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h4" gutterBottom>Shop Products</Typography>
+          <Typography variant="h4" gutterBottom>ManaiBay Products</Typography>
         </Box>
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -173,6 +174,8 @@ const EcommercePage = () => {
           />
         </Box>
       </Container>
+      <div style={{ height: 32 }} />
+      <Footer />
     </>
   );
 };

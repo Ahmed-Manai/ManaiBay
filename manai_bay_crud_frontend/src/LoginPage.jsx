@@ -119,6 +119,7 @@ const LoginPage = () => {
           )}
         </div>
       </div>
+      <div style={{ height: 32 }} />
       <Footer />
       <style>{`
         @keyframes fadeIn {
