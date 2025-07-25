@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, CircularProgress, Alert, Pagination, Button, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ThemeProvider, CssBaseline, Skeleton, Grid } from '@mui/material';
+import { Container, Typography, CircularProgress, Alert, Pagination, Button, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ThemeProvider, CssBaseline, Skeleton, Grid, Backdrop } from '@mui/material';
 import ProductList from './ProductList';
 import AdminProductForm from './AdminProductForm';
 import Header from './Header';
@@ -118,19 +118,31 @@ const EcommercePage = () => {
             )}
           </Box>
         </Box>
-        {loading ? (
-          <Grid container spacing={4}>
-            {Array.from(new Array(PAGE_SIZE)).map((_, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                <Skeleton variant="rectangular" width="100%" height={200} />
-                <Skeleton />
-                <Skeleton width="60%" />
-              </Grid>
-            ))}
-          </Grid>
-        ) : error ? (
+        {loading && (
+          <Backdrop open={true} sx={{ color: '#fff', flexDirection: 'column', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+            <CircularProgress size={70} thickness={4.5} sx={{ color: '#1976d2', mb: 3 }} />
+            <Box
+              sx={{
+                fontSize: 22,
+                fontWeight: 600,
+                color: '#1976d2',
+                letterSpacing: 1,
+                background: 'rgba(255,255,255,0.85)',
+                px: 4,
+                py: 1.5,
+                borderRadius: 2,
+                boxShadow: '0 2px 12px rgba(25, 118, 210, 0.10)',
+                textAlign: 'center',
+                fontFamily: 'Montserrat, Roboto, Arial, sans-serif',
+              }}
+            >
+              Please wait...
+            </Box>
+          </Backdrop>
+        )}
+        {!loading && error ? (
           <Alert severity="error">{error}</Alert>
-        ) : (
+        ) : !loading && (
           <>
             <ProductList
               products={paginatedProducts}
