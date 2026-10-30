@@ -17,4 +17,12 @@ def get_cassandra_session():
         hashed_password TEXT
     );
     ''')
+    # Ensure the clients table exists
+    session.execute('''
+    CREATE TABLE IF NOT EXISTS clients (
+        id UUID PRIMARY KEY,
+        name TEXT,
+        email TEXT
+    );
+    ''')
     return session

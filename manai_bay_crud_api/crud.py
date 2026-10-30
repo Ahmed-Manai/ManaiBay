@@ -1,6 +1,6 @@
 
 # CRUD operations for Client entity
-from uuid import uuid4
+from uuid import UUID, uuid4
 from schemas import ClientCreate, Client
 from cassandra.query import SimpleStatement
 
