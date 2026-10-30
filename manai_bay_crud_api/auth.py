@@ -1,5 +1,6 @@
 
 # Authentication and security utilities for FastAPI app
+import os
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
@@ -7,13 +8,16 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from schemas import UserCreate
 from uuid import uuid4
-from database import session
+from database import get_cassandra_session
 
 
 # === CONFIGURATION ===
 
-# Secret key for JWT token encoding (should be set via environment variable in production)
-SECRET_KEY = "your-secret-key"  # Change this in production
+# Insecure fallback used ONLY for local development when SECRET_KEY is not set.
+# Always set the SECRET_KEY environment variable in any shared or production environment.
+DEV_FALLBACK_SECRET_KEY = "your-secret-key"
+# Secret key for JWT token encoding, read from the SECRET_KEY environment variable
+SECRET_KEY = os.getenv("SECRET_KEY") or DEV_FALLBACK_SECRET_KEY
 # JWT algorithm
 ALGORITHM = "HS256"
 # Token expiration time in minutes
@@ -70,10 +74,7 @@ def get_user_by_email(email: str) -> dict | None:
     Returns:
         dict or None: User data if found, else None.
     """
-    result = session.execute(
-        "SELECT * FROM users WHERE email=%s ALLOW FILTERING", (email,)
-    ).one()
-    return result._asdict() if result else None
+    return get_user_by_email_with_session(email, get_cassandra_session())
 
 # === AUTHENTICATION LOGIC ===
 def authenticate_user(email: str, password: str, session=None) -> dict | None:
@@ -106,11 +107,12 @@ def get_user_by_email_with_session(email: str, session) -> dict | None:
     return result._asdict() if result else None
 
 # === FASTAPI DEPENDENCY ===
-def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+def get_current_user(token: str = Depends(oauth2_scheme), session=Depends(get_cassandra_session)) -> dict:
     """
     FastAPI dependency to get the current authenticated user from JWT token.
     Args:
         token (str): JWT token from request.
+        session: Cassandra session (injected by FastAPI).
     Returns:
         dict: Authenticated user data.
     Raises:
@@ -128,7 +130,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = get_user_by_email(email)
+    user = get_user_by_email_with_session(email, session)
     if user is None:
         raise credentials_exception
     return user
