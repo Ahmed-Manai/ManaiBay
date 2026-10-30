@@ -66,11 +66,11 @@ const LoginForm = ({ onLogin }) => {
       </Box>
     </Paper>
   );
+};
 
 // Prop types for type safety
 LoginForm.propTypes = {
   onLogin: PropTypes.func.isRequired,
-};
 };
 
 export default LoginForm;

@@ -71,11 +71,11 @@ const RegisterForm = ({ onRegister }) => {
       </Box>
     </Paper>
   );
+};
 
 // Prop types for type safety
 RegisterForm.propTypes = {
   onRegister: PropTypes.func,
-};
 };
 
 export default RegisterForm;

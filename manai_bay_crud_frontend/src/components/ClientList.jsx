@@ -63,12 +63,12 @@ const ClientList = ({ onEdit, refreshTrigger }) => {
       </Table>
     </TableContainer>
   );
+};
 
 // Prop types for type safety
 ClientList.propTypes = {
   onEdit: PropTypes.func.isRequired,
   refreshTrigger: PropTypes.any,
-};
 };
 
 export default ClientList;

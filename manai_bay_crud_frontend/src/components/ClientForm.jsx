@@ -67,13 +67,13 @@ const ClientForm = ({ onCreated, editClient, clearEdit }) => {
       </Stack>
     </Box>
   );
+};
 
 // Prop types for type safety
 ClientForm.propTypes = {
   onCreated: PropTypes.func.isRequired,
   editClient: PropTypes.object,
   clearEdit: PropTypes.func.isRequired,
-};
 };
 
 export default ClientForm;
